@@ -53,9 +53,9 @@ struct msm_rng_device {
 	struct mutex rng_lock;
 };
 
-struct msm_rng_device msm_rng_device_info;
+static struct msm_rng_device msm_rng_device_info;
 static struct msm_rng_device *msm_rng_dev_cached;
-struct mutex cached_rng_lock;
+static struct mutex cached_rng_lock;
 static long msm_rng_ioctl(struct file *filp, unsigned int cmd,
 				unsigned long arg)
 {
@@ -85,7 +85,6 @@ static long msm_rng_ioctl(struct file *filp, unsigned int cmd,
 static int msm_rng_direct_read(struct msm_rng_device *msm_rng_dev,
 					void *data, size_t max)
 {
-	struct platform_device *pdev;
 	void __iomem *base;
 	size_t currsize = 0;
 	u32 val = 0;
@@ -93,7 +92,6 @@ static int msm_rng_direct_read(struct msm_rng_device *msm_rng_dev,
 	int ret;
 	int failed = 0;
 
-	pdev = msm_rng_dev->pdev;
 	base = msm_rng_dev->base;
 
 	/* no room for word data */
@@ -249,7 +247,6 @@ static int msm_rng_probe(struct platform_device *pdev)
 	void __iomem *base = NULL;
 	bool configure_qrng = true;
 	int error = 0;
-	int ret = 0;
 	struct device *dev;
 
 	struct msm_bus_scale_pdata *qrng_platform_support = NULL;
@@ -340,7 +337,7 @@ static int msm_rng_probe(struct platform_device *pdev)
 		error = -EPERM;
 		goto rollback_clk;
 	}
-	ret = register_chrdev(QRNG_IOC_MAGIC, DRIVER_NAME, &msm_rng_fops);
+	register_chrdev(QRNG_IOC_MAGIC, DRIVER_NAME, &msm_rng_fops);
 
 	msm_rng_class = class_create(THIS_MODULE, "msm-rng");
 	if (IS_ERR(msm_rng_class)) {
